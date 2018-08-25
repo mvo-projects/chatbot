@@ -8,6 +8,13 @@ $ git clone https://github.com/mvo-projects/chatbot.git
 
 ### Setup an appropriate environment
 Download and install Anaconda or Miniconda
+
+32-bit :
+```sh
+$ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86.sh
+$ sh Miniconda3-latest-Linux-x86_64.sh
+```
+64-bit:
 ```sh
 $ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 $ sh Miniconda3-latest-Linux-x86_64.sh
