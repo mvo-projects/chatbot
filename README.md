@@ -1,5 +1,5 @@
 # chatbot
-This is a pytorch seq2seq chatbot using
+This is a pytorch seq2seq chatbot using OpenSubtitles corpus.
 
 ### Clone the project
 ```sh
