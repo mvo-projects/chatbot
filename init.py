@@ -20,8 +20,8 @@ def init_config_training(config_name):
     teacher_forcing_ratio = float(config['training']['teacher_forcing_ratio'])
     learning_rate = float(config['training']['learning_rate'])
     decoder_learning_ratio = float(config['training']['decoder_learning_ratio'])
-    epoch = int(config['training']['epoch'])
-    n_epochs = int(config['training']['n_epochs'])
+    iteration = int(config['training']['iteration'])
+    n_iterations = int(config['training']['n_iterations'])
     save_every = int(config['training']['save_every'])
     print_every = int(config['training']['print_every'])
     evaluate_every = int(config['training']['evaluate_every'])
@@ -29,7 +29,7 @@ def init_config_training(config_name):
     save_encoderpath = config['training']['save_encoderpath']
     save_decoderpath = config['training']['save_decoderpath']
     
-    return (clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, epoch, n_epochs, save_every, print_every, evaluate_every, use_cuda, save_encoderpath, save_decoderpath)
+    return (clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, use_cuda, save_encoderpath, save_decoderpath)
 
 def init_config_load(config_name):
     config = configparser.ConfigParser()
