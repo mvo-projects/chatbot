@@ -32,7 +32,7 @@ if __name__ == "__main__":
         MAX_LENGTH_EVAL, USE_CUDA, learning_rate, decoder_learning_ratio, temp_module_name, temp_function_name, n_words_vocab = init_config_eval('config.ini')
         
     elif mode == 'train':
-        clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, epoch, n_epochs, save_every, print_every, evaluate_every, USE_CUDA, encoderpath, decoderpath = init_config_training('config.ini')
+        clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, USE_CUDA, encoderpath, decoderpath = init_config_training('config.ini')
     
 
     # read_datas
@@ -96,8 +96,8 @@ if __name__ == "__main__":
         eca = 0
         dca = 0
 
-        while epoch < n_epochs:
-            epoch += 1
+        while iteration < n_iterations:
+            iteration += 1
 
             # Get training data for this cycle
             input_batches, input_lengths, target_batches, target_lengths = random_batch(input_lang, output_lang, batch_size, pairs)
@@ -114,18 +114,18 @@ if __name__ == "__main__":
             eca += ec
             dca += dc
 
-            if epoch % print_every == 0:
+            if iteration % print_every == 0:
                 print_loss_avg = print_loss_total / print_every
                 print_loss_total = 0
-                print_summary = '%s (%d %d%%) %.4f' % (time_since(start, epoch / n_epochs), epoch, epoch / n_epochs * 100, print_loss_avg)
+                print_summary = '%s (%d %d%%) %.4f' % (time_since(start, iteration / n_iterations), iteration, iteration / n_iterations * 100, print_loss_avg)
                 print(print_summary)
 
-            if epoch % evaluate_every == 0:
+            if iteration % evaluate_every == 0:
                 evaluate_randomly(encoder, decoder, pairs, input_lang, output_lang, USE_CUDA, MAX_LENGTH_EVAL, temperature_fun)
             
-            if epoch % save_every == 0:
-                save(encoderpath+str(epoch), encoder, encoder_optimizer)
-                save(decoderpath+str(epoch), decoder, decoder_optimizer)
+            if iteration % save_every == 0:
+                save(encoderpath+str(iteration), encoder, encoder_optimizer)
+                save(decoderpath+str(iteration), decoder, decoder_optimizer)
                 
         save(encoderpath+'end', encoder, encoder_optimizer)
         save(decoderpath+'end', decoder, decoder_optimizer)
