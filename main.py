@@ -37,20 +37,22 @@ if __name__ == "__main__":
 
     # read_datas
     load_training, encoderpath, decoderpath = init_config_load('config.ini')
-    MIN_LENGTH, MAX_LENGTH, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data('config.ini')
+    MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data('config.ini')
     if (USE_QACORPUS and not(CREATE_QAPAIRS)):
         input_lang, output_lang, pairs = read_qapairs('context', 'answer', qapairspath)
     else:
         input_lang, output_lang, pairs = prepare_data('context', 'answer', corpuspaths, MIN_LENGTH, MAX_LENGTH)
     
     # trim pairs
-    MIN_COUNT = 5
-    input_lang.trim(MIN_COUNT)
-    output_lang.trim(MIN_COUNT)
+    input_lang.trim(TRIM_MIN_COUNT)
+    output_lang.trim(TRIM_MIN_COUNT)
     pairs = trimpairs(input_lang, output_lang, pairs)
     
     # USE GPU ?
-    device = torch.device("cpu")
+    if (USE_CUDA):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device("cpu")
     #torch.cuda.set_device(1)
 
     # Initialize models
@@ -61,6 +63,9 @@ if __name__ == "__main__":
     if optimizer_name == 'Adam':
         encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
         decoder_optimizer = optim.Adam(decoder.parameters(), lr=learning_rate * decoder_learning_ratio)
+    elif optimizer_name == 'SGD':
+        encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
+        decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate * decoder_learning_ratio)
     
     if criterion_name == 'NLLLoss':
         criterion = nn.NLLLoss()
