@@ -124,10 +124,13 @@ class LuongAttnDecoderRNN(nn.Module):
         # Return final output, hidden state, and attention weights (for visualization)
         return output, hidden, attn_weights
 
-def load(name, model, optimizer):
+def load(use_cuda, name, model, optimizer):
     if os.path.isfile((name + '.pth')):
         print("=> loading model... ")
-        checkpoint = torch.load(name + '.pth')
+        if (use_cuda):
+            checkpoint = torch.load(name + '.pth')
+        else:
+            checkpoint = torch.load(name + '.pth', map_location=lambda storage, loc: storage)
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("done !")

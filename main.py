@@ -78,8 +78,8 @@ if __name__ == "__main__":
         decoder.cuda()
     
     if load_training:
-        load(encoderpath, encoder, encoder_optimizer)
-        load(decoderpath, decoder, decoder_optimizer)
+        load(USE_CUDA, encoderpath, encoder, encoder_optimizer)
+        load(USE_CUDA, decoderpath, decoder, decoder_optimizer)
 
     if mode == 'eval':
         try:
