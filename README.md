@@ -31,6 +31,7 @@ $ conda create --name chatbot --file chatbot/spec-file.txt
 ```sh
 $ curl -0 https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 $ sh Miniconda3-latest-MacOSX-x86_64.sh
+```
 Create an appropriate environment using the spec-file
 ```sh
 $ conda create --name chatbot --file chatbot/spec-file-osx.txt
