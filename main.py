@@ -30,11 +30,11 @@ def create_model(config_file, USE_CUDA):
 
     # read_datas
     load_training, encoderpath, decoderpath = init_config_load(config_file)
-    MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data(config_file)
+    MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, DELAY, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data(config_file)
     if (USE_QACORPUS and not(CREATE_QAPAIRS)):
         input_lang, output_lang, pairs = read_qapairs('context', 'answer', qapairspath)
     else:
-        input_lang, output_lang, pairs = prepare_data('context', 'answer', corpuspaths, MIN_LENGTH, MAX_LENGTH)
+        input_lang, output_lang, pairs = prepare_data('context', 'answer', corpuspaths, MIN_LENGTH, MAX_LENGTH, DELAY)
     
     # trim pairs
     input_lang.trim(TRIM_MIN_COUNT)
@@ -74,7 +74,7 @@ def create_model(config_file, USE_CUDA):
         load(USE_CUDA, encoderpath, encoder, encoder_optimizer)
         load(USE_CUDA, decoderpath, decoder, decoder_optimizer)
         
-    return (input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, MAX_LENGTH)
+    return (input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, USE_QACORPUS, MAX_LENGTH)
 
 if __name__ == "__main__":
     # parse arguments
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     # Get Settings | Parameters 
     mode, USE_CUDA = init_config_getSettings(config_file)
-    input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, MAX_LENGTH = create_model(config_file, USE_CUDA)
+    input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, USE_QACORPUS, MAX_LENGTH = create_model(config_file, USE_CUDA)
     MAX_LENGTH_EVAL, temp_module_name, temp_function_name, n_words_vocab = init_config_eval(config_file)
     batch_size, clip, teacher_forcing_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, encoderpath, decoderpath = init_config_training(config_file)
         
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         except ImportError as err:
             print('Error:', err)
             quit()
-        test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, MAX_LENGTH_EVAL, temperature_fun, n_words_vocab)
+        test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, MAX_LENGTH_EVAL, temperature_fun, USE_QACORPUS, n_words_vocab)
              
     elif mode == 'train':
         # Keep track of time elapsed and running averages

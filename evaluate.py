@@ -13,34 +13,34 @@ from masked_cross_entropy import *
 import numpy as np
 import readline
 
-def alan_answer(input_string, encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
+def alan_answer(input_string, encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, USE_QACORPUS=False, n_words=100):
     try:
-        input_string = normalize_input(input_string)
+        input_string = normalize_input(input_string, USE_QACORPUS)
         output_words, attentions, confidence = evaluate(encoder, decoder, context, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words)
         output_sentence = ' '.join(output_words)
-        output_sentence = postProcess(output_sentence)
+        output_sentence = postProcess(output_sentence, USE_QACORPUS)
     except Exception as e:
         print("Exception : ", e)
     return output_sentence, confidence
 
-def test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
+def test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, USE_QACORPUS=False, n_words=100):
     print("Alan est prêt à vous recevoir.")
     while 1:
         print()
         context = str(input('')).strip()
-        context = normalize_input(context)
+        context = normalize_input(context, USE_QACORPUS)
         if context == 'quit':
             break
         try:
             output_words, attentions, confidence = evaluate(encoder, decoder, context, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words)
             output_sentence = ' '.join(output_words)
-            output_sentence = postProcess(output_sentence)
+            output_sentence = postProcess(output_sentence, USE_QACORPUS)
             print('< ', output_sentence)
             print('Je me sens confiant à : ', confidence, '%')
-            #output_words, attentions = evaluateBest(encoder, decoder, context, input_lang, output_lang, USE_CUDA, max_length)
-            #output_sentence = ' '.join(output_words)
-            #output_sentence = postProcess(output_sentence)
-            #print('BEST : ', output_sentence)
+            output_words, attentions = evaluateBest(encoder, decoder, context, input_lang, output_lang, USE_CUDA, max_length)
+            output_sentence = ' '.join(output_words)
+            output_sentence = postProcess(output_sentence, USE_QACORPUS)
+            print('BEST : ', output_sentence)
         except Exception as e:
             print("Exception: ", e)
             continue
@@ -53,7 +53,7 @@ def indexHigh(lname, x):
 def evaluate(encoder, decoder, input_seq, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
 
     with torch.no_grad():
-        confidence = 1
+        confidence = 1.0
         input_seqs = [indexes_from_sentence(input_lang, input_seq)]
         input_lengths = [len(input_seqs[0])]
         input_batches = Variable(torch.LongTensor(input_seqs)).transpose(0, 1)
@@ -109,7 +109,7 @@ def evaluate(encoder, decoder, input_seq, input_lang, output_lang, USE_CUDA, max
             rndnum = random.uniform(0, 1)
             ih = indexHigh(sum_ns, rndnum)
             ni = topi[0][ih]
-            confidence *= normalized_sum[ih]
+            confidence *= (current_nv[ih]/allsum)
 
             #print(output_lang.index2word[ni.item()])
             if di == 0:

@@ -57,6 +57,7 @@ def init_config_data(config_name):
     qapairspath = []
     MIN_LENGTH = int(config['data']['min_length'])
     MAX_LENGTH = int(config['data']['max_length'])
+    DELAY = int(config['data']['delay'])
     TRIM_MIN_COUNT = int(config['data']['trim_min_count'])
     
     USE_QACORPUS = config['data'].getboolean('use_qacorpus')
@@ -69,7 +70,7 @@ def init_config_data(config_name):
         else:
             qapairspath = config['data']['qapairspath']
     
-    return (MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath, )
+    return (MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, DELAY, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath)
 
 def init_config_getSettings(config_name):
     config = configparser.ConfigParser()

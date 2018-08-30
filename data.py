@@ -81,20 +81,27 @@ def normalize_string(s):
     s = re.sub(r"\s+", r" ", s).strip()
     return s
 
-def normalize_input(s):
-    s = unicodedata.normalize('NFC', s.strip())
+def normalize_input(s, lower=False):
+    if not(lower):
+        s = unicodedata.normalize('NFC', s.strip())
+    else:
+        s = unicodedata.normalize('NFC', s.lower().strip())
     s = re.sub(r"([,.!?])", r" \1 ", s)
+    s = re.sub(r"œ", r"oe", s)
+    s = re.sub(r"æ", r"ae", s)
     s = re.sub(r"'", r"' ", s)
     s = re.sub(r"\s+", r" ", s).strip()
     return s
 
-def postProcess(s):
+def postProcess(s, lower=False):
     s = unicodedata.normalize('NFC', s.strip())
     s = re.sub("<EOS>", " ", s)
     s = re.sub(r"\s([,.])", r"\1", s)
     s = re.sub(r"([!?;:])", r" \1 ", s)
     s = re.sub("' ", "'", s)
     s = re.sub(r"\s+", r" ", s).strip()
+    if lower:
+        return s.capitalize()
     return s
 
 def filter_pairs(pairs, MIN_LENGTH, MAX_LENGTH):
@@ -105,7 +112,7 @@ def filter_pairs(pairs, MIN_LENGTH, MAX_LENGTH):
                 filtered_pairs.append(pair)
     return filtered_pairs
 
-def readXMLfiles(dpath, td=True, delay=5, create_qacorpus=False):
+def readXMLfiles(dpath, delay, td=True, create_qacorpus=False):
     moviepairs = []
     for dirpath, dirs, files in os.walk(dpath, topdown=td):
         for filename in files:
@@ -160,12 +167,12 @@ def readXMLfiles(dpath, td=True, delay=5, create_qacorpus=False):
     return (moviepairs)
 
 
-def prepare_data(lang1_name, lang2_name, dpath, MIN_LENGTH, MAX_LENGTH, create_qa=False):
+def prepare_data(lang1_name, lang2_name, dpath, MIN_LENGTH, MAX_LENGTH, delay, create_qa=False):
     input_lang = Lang(lang1_name)
     output_lang = Lang(lang2_name)
     moviepairs = []
     for path in dpath:
-        moviepairs += readXMLfiles(path, create_qacorpus=create_qa)
+        moviepairs += readXMLfiles(path, delay, create_qacorpus=create_qa)
     i = 0
     for pairs in moviepairs:
         moviepairs[i] = filter_pairs(pairs, MIN_LENGTH, MAX_LENGTH)
