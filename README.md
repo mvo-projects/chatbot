@@ -1,5 +1,5 @@
 # chatbot
-This is a pytorch seq2seq chatbot using OpenSubtitles corpus.
+This is a PyTorch seq2seq chatbot based on [the official PyTorch tutorial](https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html) using OpenSubtitles corpus.
 
 ### Clone the project
 ```sh
@@ -48,7 +48,7 @@ This is an example of some parameters and their possible values :
 
 | parameters       | values                  | comments                                                                                |
 | ---------------- |:-----------------------:| ---------------------------------------------------------------------------------------:|
-| mode             | `train / eval`          | *You can to either training your model or evaluating it*                                |
+| mode             | `train / eval`          | *You can either train your model or evaluate it*                                        |
 | use_cuda         | `yes / no`              | *Do you want to use your gpu ?*                                                         |
 | corpuspaths      | `path(s)_to_corpus`     | *One or multiples directories separate by a comma*                                      |
 | load_encoderpath | `path_to_encoder_model` | *Relative or absolute path to the encoder_model if you want to eval or resume training* |
@@ -59,7 +59,7 @@ This is an example of some parameters and their possible values :
 $ source activate chatbot
 ```
 
-### Launch the main program
+### Launch the main program using the appropriate config_file for your model
 ```sh
-$ python main.py
+$ python main.py [config_file.ini]
 ```
