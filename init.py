@@ -7,29 +7,28 @@ def init_config_model(config_name):
     hidden_size = int(config['model']['hidden_size'])
     n_layers = int(config['model']['n_layers'])
     dropout = float(config['model']['dropout'])
-    batch_size = int(config['model']['batch_size'])
     optimizer_name = config['model']['optimizer']
     criterion_name = config['model']['criterion']
+    learning_rate = float(config['model']['learning_rate'])
+    decoder_learning_ratio = float(config['model']['decoder_learning_ratio'])
     
-    return (attn_model, hidden_size, n_layers, dropout, batch_size, optimizer_name, criterion_name)
+    return (attn_model, hidden_size, n_layers, dropout, optimizer_name, criterion_name, learning_rate, decoder_learning_ratio)
 
 def init_config_training(config_name):
     config = configparser.ConfigParser()
     config.read(config_name)
+    batch_size = int(config['training']['batch_size'])
     clip = float(config['training']['clip'])
     teacher_forcing_ratio = float(config['training']['teacher_forcing_ratio'])
-    learning_rate = float(config['training']['learning_rate'])
-    decoder_learning_ratio = float(config['training']['decoder_learning_ratio'])
     iteration = int(config['training']['iteration'])
     n_iterations = int(config['training']['n_iterations'])
     save_every = int(config['training']['save_every'])
     print_every = int(config['training']['print_every'])
     evaluate_every = int(config['training']['evaluate_every'])
-    use_cuda = config['training'].getboolean('use_cuda')
     save_encoderpath = config['training']['save_encoderpath']
     save_decoderpath = config['training']['save_decoderpath']
     
-    return (clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, use_cuda, save_encoderpath, save_decoderpath)
+    return (batch_size, clip, teacher_forcing_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, save_encoderpath, save_decoderpath)
 
 def init_config_load(config_name):
     config = configparser.ConfigParser()
@@ -45,14 +44,11 @@ def init_config_eval(config_name):
     config = configparser.ConfigParser()
     config.read(config_name)
     MAX_LENGTH = int(config['eval']['max_length'])
-    use_cuda = config['eval'].getboolean('use_cuda')
-    learning_rate = float(config['training']['learning_rate'])
-    decoder_learning_ratio = float(config['training']['decoder_learning_ratio'])
     temp_module_name = config['eval']['temperature_module_name']
     temp_function_name = config['eval']['temperature_function_name']
     n_words_vocab = int(config['eval']['n_words_vocab'])
     
-    return (MAX_LENGTH, use_cuda, learning_rate, decoder_learning_ratio, temp_module_name, temp_function_name, n_words_vocab)
+    return (MAX_LENGTH, temp_module_name, temp_function_name, n_words_vocab)
 
 def init_config_data(config_name):
     config = configparser.ConfigParser()
@@ -75,9 +71,10 @@ def init_config_data(config_name):
     
     return (MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath, )
 
-def init_config_getmode(config_name):
+def init_config_getSettings(config_name):
     config = configparser.ConfigParser()
     config.read(config_name)
     mode = config['init']['mode']
+    use_cuda = config['init'].getboolean('use_cuda')
     
-    return mode
+    return mode, use_cuda

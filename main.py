@@ -10,6 +10,7 @@ import time
 import datetime
 import math
 import importlib
+import sys
 
 def as_minutes(s):
     m = math.floor(s / 60)
@@ -23,21 +24,13 @@ def time_since(since, percent):
     rs = es - s
     return '%s (- %s)' % (as_minutes(s), as_minutes(rs))
 
-if __name__ == "__main__":
+def create_model(config_file, USE_CUDA):
     # Initialize configs
-    mode = init_config_getmode('config.ini')
-    attn_model, hidden_size, n_layers, dropout, batch_size, optimizer_name, criterion_name = init_config_model('config.ini')
-
-    if mode == 'eval':
-        MAX_LENGTH_EVAL, USE_CUDA, learning_rate, decoder_learning_ratio, temp_module_name, temp_function_name, n_words_vocab = init_config_eval('config.ini')
-        
-    elif mode == 'train':
-        clip, teacher_forcing_ratio, learning_rate, decoder_learning_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, USE_CUDA, encoderpath, decoderpath = init_config_training('config.ini')
-    
+    attn_model, hidden_size, n_layers, dropout, optimizer_name, criterion_name, learning_rate, decoder_learning_ratio = init_config_model(config_file)
 
     # read_datas
-    load_training, encoderpath, decoderpath = init_config_load('config.ini')
-    MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data('config.ini')
+    load_training, encoderpath, decoderpath = init_config_load(config_file)
+    MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath = init_config_data(config_file)
     if (USE_QACORPUS and not(CREATE_QAPAIRS)):
         input_lang, output_lang, pairs = read_qapairs('context', 'answer', qapairspath)
     else:
@@ -80,16 +73,38 @@ if __name__ == "__main__":
     if load_training:
         load(USE_CUDA, encoderpath, encoder, encoder_optimizer)
         load(USE_CUDA, decoderpath, decoder, decoder_optimizer)
+        
+    return (input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, MAX_LENGTH)
 
+if __name__ == "__main__":
+    # parse arguments
+    config_file = 'config.ini'
+    args = sys.argv[1:]
+    if (len(args) > 1):
+        print('Usage : python', sys.argv[0], '[config_file.ini]')
+        quit()
+    if (len(args) == 1):
+        if args[0].endswith('.ini'):
+            config_file = args[0]
+        else:
+            print('Usage : python', sys.argv[0], '[config_file.ini]')
+            quit()
+    
+    # Get Settings | Parameters 
+    mode, USE_CUDA = init_config_getSettings(config_file)
+    input_lang, output_lang, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, MAX_LENGTH = create_model(config_file, USE_CUDA)
+    MAX_LENGTH_EVAL, temp_module_name, temp_function_name, n_words_vocab = init_config_eval(config_file)
+    batch_size, clip, teacher_forcing_ratio, iteration, n_iterations, save_every, print_every, evaluate_every, encoderpath, decoderpath = init_config_training(config_file)
+        
     if mode == 'eval':
         try:
             temperature_module = importlib.import_module(temp_module_name)
             temperature_fun = getattr(temperature_module, temp_function_name)
         except ImportError as err:
             print('Error:', err)
-        alan_main(encoder, decoder, input_lang, output_lang, USE_CUDA, MAX_LENGTH, temperature_fun, n_words_vocab)
-            
-        
+            quit()
+        test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, MAX_LENGTH_EVAL, temperature_fun, n_words_vocab)
+             
     elif mode == 'train':
         # Keep track of time elapsed and running averages
         start = time.time()

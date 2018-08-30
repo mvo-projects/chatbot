@@ -13,7 +13,17 @@ from masked_cross_entropy import *
 import numpy as np
 import readline
 
-def alan_main(encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
+def alan_answer(input_string, encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
+    try:
+        input_string = normalize_input(input_string)
+        output_words, attentions, confidence = evaluate(encoder, decoder, context, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words)
+        output_sentence = ' '.join(output_words)
+        output_sentence = postProcess(output_sentence)
+    except Exception as e:
+        print("Exception : ", e)
+    return output_sentence, confidence
+
+def test_chatbot(encoder, decoder, input_lang, output_lang, USE_CUDA, max_length, temperature_fun, n_words=100):
     print("Alan est prêt à vous recevoir.")
     while 1:
         print()
