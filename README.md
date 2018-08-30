@@ -59,7 +59,7 @@ This is an example of some parameters and their possible values :
 $ source activate chatbot
 ```
 
-### Lunch the main program
+### Launch the main program
 ```sh
 $ python main.py
 ```
