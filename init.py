@@ -46,9 +46,9 @@ def init_config_eval(config_name):
     MAX_LENGTH = int(config['eval']['max_length'])
     temp_module_name = config['eval']['temperature_module_name']
     temp_function_name = config['eval']['temperature_function_name']
-    n_words_vocab = int(config['eval']['n_words_vocab'])
+    n_best_words = int(config['eval']['n_best_words'])
     
-    return (MAX_LENGTH, temp_module_name, temp_function_name, n_words_vocab)
+    return (MAX_LENGTH, temp_module_name, temp_function_name, n_best_words)
 
 def init_config_data(config_name):
     config = configparser.ConfigParser()
@@ -70,7 +70,7 @@ def init_config_data(config_name):
         else:
             qapairspath = config['data']['qapairspath']
     
-    return (MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, DELAY, USE_QACORPUS, CREATE_QAPAIRS, corpuspaths, qapairspath)
+    return (MIN_LENGTH, MAX_LENGTH, TRIM_MIN_COUNT, DELAY, USE_QACORPUS, CREATE_QAPAIRS, list(map(str.strip, corpuspaths)), qapairspath)
 
 def init_config_getSettings(config_name):
     config = configparser.ConfigParser()
