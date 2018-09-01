@@ -73,7 +73,7 @@ def train(input_batches, input_lengths, target_batches, target_lengths, batch_si
     # Run through decoder one time step at a time
     for t in range(max_target_length):
         decoder_output, decoder_hidden, decoder_attn = decoder(
-            decoder_input, decoder_hidden, encoder_outputs
+            decoder_input, decoder_hidden, encoder_outputs, USE_CUDA
         )
 
         all_decoder_outputs[t] = decoder_output
